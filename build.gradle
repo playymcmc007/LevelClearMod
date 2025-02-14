@@ -1,0 +1,90 @@
+plugins {
+	id 'fabric-loom' version '1.8.10' // Fabric Loom 插件，用于构建 Fabric 模组
+	id 'maven-publish' // 用于发布模组到 Maven 仓库
+}
+
+version = '1.0.0' // 模组版本
+group = 'com.playymcmc007.levelclear' // 模组组 ID，通常是你的域名反写
+
+repositories {
+	// 添加必要的仓库
+	maven { url 'https://maven.fabricmc.net/' } // Fabric Maven 仓库
+	maven { url 'https://maven.minecraftforge.net/' } // 如果需要其他依赖项，可以添加 Forge 仓库
+	maven { url "https://maven.shedaniel.me/" } // Cloth Config 仓库
+	maven { url "https://maven.terraformersmc.com/releases/" } // Mod Menu 仓库
+	mavenCentral() // Maven 中央仓库
+}
+
+dependencies {
+	// Fabric API 依赖
+	minecraft "com.mojang:minecraft:1.21.1"
+	mappings "net.fabricmc:yarn:1.21.1+build.3:v2"
+	modImplementation "net.fabricmc:fabric-loader:0.16.10" // Fabric Loader
+	modImplementation "net.fabricmc.fabric-api:fabric-api:0.115.0+1.21.1" // Fabric API
+	modApi "me.shedaniel.cloth:cloth-config-fabric:12.0.110"
+}
+
+loom {
+	// Loom 配置
+	mixin {
+		defaultRefmapName = "levelclear-refmap.json" // Mixin 的默认 refmap 名称
+	}
+	runs {
+		client {
+			client() // 客户端运行配置
+			configName = "Client"
+			ideConfigGenerated = true
+			runDir = "run/client"
+		}
+		server {
+			server() // 服务器运行配置
+			configName = "Server"
+			ideConfigGenerated = true
+			runDir = "run/server"
+		}
+	}
+}
+
+java {
+	// 设置 Java 版本
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
+	withSourcesJar() // 生成源码 JAR
+}
+
+tasks.withType(JavaCompile).configureEach {
+	// 确保使用 UTF-8 编码
+	options.encoding = 'UTF-8'
+}
+
+jar {
+	// 设置 JAR 文件的元数据
+	from("LICENSE") {
+		rename { "${it}_${project.archivesBaseName}" }
+	}
+	manifest {
+		attributes([
+				"Specification-Title"     : "LevelClear",
+				"Specification-Vendor"    : "LevelClearMods",
+				"Specification-Version"   : "1",
+				"Implementation-Title"    : project.name,
+				"Implementation-Version"  : project.version,
+				"Implementation-Vendor"   : "LevelClearMods",
+		])
+	}
+}
+
+publishing {
+	// 发布配置
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+		}
+	}
+	repositories {
+		// 如果需要发布到 Maven 仓库，可以在这里配置
+		maven {
+			url "file://${project.projectDir}/maven-repo"
+		}
+	}
+}
