@@ -26,6 +26,6 @@ public class LevelClearConfig implements ConfigData {
     public boolean destroySaveOnExit = false;
     public String destroySaveOnExitDescription = "#是否启用存档销毁选项，若为true，存档将在退出游戏后删除";
 
-    public String other = "//因为屎山代码堆起来了，再改容易出问题，所以注释这么写着，实际参数是用不着的";
+    public String other = "#因为屎山代码堆起来了，再改容易出问题，所以注释这么写着，实际参数是用不着的";
 
 }
