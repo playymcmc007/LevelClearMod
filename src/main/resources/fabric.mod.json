@@ -29,9 +29,9 @@
 	"depends": {
 		"minecraft": "1.21.1",
 		"fabric-api": "*",
-		"cloth-config": "15.0.140"
+		"cloth-config": ">=15.0.140"
 	},
 	"suggests": {
-		"another-mod": "*"
+		"modmenu": ">=11.0.3"
 	}
 }
