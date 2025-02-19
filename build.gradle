@@ -1,90 +1,74 @@
 plugins {
-	id 'fabric-loom' version '1.8.10' // Fabric Loom 插件，用于构建 Fabric 模组
-	id 'maven-publish' // 用于发布模组到 Maven 仓库
+	id 'fabric-loom' version '1.9-SNAPSHOT'
+	id 'maven-publish'
 }
 
-version = '1.0.0' // 模组版本
-group = 'com.playymcmc007.levelclear' // 模组组 ID，通常是你的域名反写
+version = project.mod_version
+group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name
+}
 
 repositories {
-	// 添加必要的仓库
-	maven { url 'https://maven.fabricmc.net/' } // Fabric Maven 仓库
-	maven { url 'https://maven.minecraftforge.net/' } // 如果需要其他依赖项，可以添加 Forge 仓库
-	maven { url "https://maven.shedaniel.me/" } // Cloth Config 仓库
-	maven { url "https://maven.terraformersmc.com/releases/" } // Mod Menu 仓库
-	mavenCentral() // Maven 中央仓库
+	maven { url 'https://maven.fabricmc.net/' }
+	maven { url "https://maven.shedaniel.me/" }
+	maven { url "https://maven.terraformersmc.com/" }
+	mavenCentral()
 }
 
 dependencies {
-	// Fabric API 依赖
-	minecraft "com.mojang:minecraft:1.21.1"
-	mappings "net.fabricmc:yarn:1.21.1+build.3:v2"
-	modImplementation "net.fabricmc:fabric-loader:0.16.10" // Fabric Loader
-	modImplementation "net.fabricmc.fabric-api:fabric-api:0.115.0+1.21.1" // Fabric API
-	modApi "me.shedaniel.cloth:cloth-config-fabric:12.0.110"
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	modApi "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
+	modImplementation("com.terraformersmc:modmenu:${project.modmenu_version}")
 }
 
 loom {
-	// Loom 配置
-	mixin {
-		defaultRefmapName = "levelclear-refmap.json" // Mixin 的默认 refmap 名称
-	}
-	runs {
-		client {
-			client() // 客户端运行配置
-			configName = "Client"
-			ideConfigGenerated = true
-			runDir = "run/client"
-		}
-		server {
-			server() // 服务器运行配置
-			configName = "Server"
-			ideConfigGenerated = true
-			runDir = "run/server"
+	// accessWidenerPath = file("src/main/resources/levelclear.accesswidener")
+	mods {
+		"levelclear" {
+			sourceSet sourceSets.main
 		}
 	}
+
 }
 
 java {
-	// 设置 Java 版本
-	sourceCompatibility = JavaVersion.VERSION_17
-	targetCompatibility = JavaVersion.VERSION_17
-	withSourcesJar() // 生成源码 JAR
-}
-
-tasks.withType(JavaCompile).configureEach {
-	// 确保使用 UTF-8 编码
-	options.encoding = 'UTF-8'
+	withSourcesJar()
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {
-	// 设置 JAR 文件的元数据
 	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}" }
+		rename { "${it}_${project.base.archivesName.get()}" }
 	}
-	manifest {
-		attributes([
-				"Specification-Title"     : "LevelClear",
-				"Specification-Vendor"    : "LevelClearMods",
-				"Specification-Version"   : "1",
-				"Implementation-Title"    : project.name,
-				"Implementation-Version"  : project.version,
-				"Implementation-Vendor"   : "LevelClearMods",
-		])
+}
+
+processResources {
+	inputs.property "version", project.version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": project.version
 	}
 }
 
 publishing {
-	// 发布配置
 	publications {
 		mavenJava(MavenPublication) {
 			from components.java
 		}
 	}
+
 	repositories {
-		// 如果需要发布到 Maven 仓库，可以在这里配置
-		maven {
-			url "file://${project.projectDir}/maven-repo"
-		}
+
 	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 21
+	options.encoding = 'UTF-8'
 }
