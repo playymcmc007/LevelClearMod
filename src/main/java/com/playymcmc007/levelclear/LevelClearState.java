@@ -10,6 +10,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +23,7 @@ public class LevelClearState extends PersistentState {
     private boolean shouldDestroySave = false;
     private List<String> triggeredPlayers = new ArrayList<>();
     private File triggeredPlayersFile;
+    private static final Logger LOGGER = LoggerFactory.getLogger(LevelClearState.class);
 
 
     public static LevelClearState getServerState(MinecraftServer server) {
@@ -83,7 +86,7 @@ public class LevelClearState extends PersistentState {
         try (FileOutputStream fos = new FileOutputStream(triggeredPlayersFile)) {
             fos.write(new Gson().toJson(triggeredPlayers).getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("保存失败! ", e);
         }
     }
 
@@ -93,7 +96,7 @@ public class LevelClearState extends PersistentState {
         try (FileInputStream fis = new FileInputStream(triggeredPlayersFile)) {
             triggeredPlayers = (List<String>) new Gson().fromJson(new InputStreamReader(fis, StandardCharsets.UTF_8), List.class);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("加载失败! ", e);
         }
     }
 

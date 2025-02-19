@@ -16,11 +16,15 @@ import net.minecraft.world.GameMode;
 import net.minecraft.registry.Registries;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.Toml4jConfigSerializer;
+import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 
 public class LevelClearMod implements ModInitializer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LevelClearMod.class);
     private static LevelClearConfig config;
     private long lastMessageTime = 0;
 
@@ -128,16 +132,16 @@ public class LevelClearMod implements ModInitializer {
         File worldFolder = new File(worldFolderName);
 
         if (!worldFolder.exists()) {
-            System.err.println("存档文件夹不存在: " + worldFolder.getAbsolutePath());
+            LOGGER.error("存档文件夹不存在: {}", worldFolder.getAbsolutePath());
             return;
         }
 
         try {
             deleteFolder(worldFolder);
-            System.out.println("存档已删除: " + worldFolder.getAbsolutePath());
+            LOGGER.info("存档已删除: " + worldFolder.getAbsolutePath());
         } catch (IOException e) {
             if (remainingAttempts > 0) {
-                System.err.println("删除存档失败，剩余重试次数: " + remainingAttempts + "，0.5秒后重试...");
+                LOGGER.error("删除存档失败，剩余重试次数: {}，0.5秒后重试...", remainingAttempts);
                 server.submit(() -> {
                     try {
                         Thread.sleep(500);
@@ -148,7 +152,7 @@ public class LevelClearMod implements ModInitializer {
                     return null;
                 });
             } else {
-                System.err.println("存档删除失败: " + e.getMessage());
+                LOGGER.error("存档删除失败: {}", e.getMessage());
             }
         }
     }
