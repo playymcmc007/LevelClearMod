@@ -6,37 +6,22 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.WorldSavePath;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class LevelClearState extends PersistentState {
     private boolean triggered = false;
     private boolean shouldDestroySave = false;
-    private List<String> triggeredPlayers = new ArrayList<>();
-    private File triggeredPlayersFile;
+    private final List<String> triggeredPlayers = new ArrayList<>();
 
 
     public static LevelClearState getServerState(MinecraftServer server) {
         PersistentStateManager manager = server.getOverworld().getPersistentStateManager();
-        LevelClearState state = manager.getOrCreate(getType(), "levelclear_state");
-        // 初始化文件路径
-        File worldSavePath = server.getSavePath(WorldSavePath.ROOT).toFile();
-        state.setWorldSavePath(worldSavePath);
 
-        // 加载玩家名字
-        state.loadTriggeredPlayersFromFile();
-
-        return state;
+        return manager.getOrCreate(getType(), "levelclear_state");
     }
 
     public static Type<LevelClearState> getType() {
@@ -71,42 +56,13 @@ public class LevelClearState extends PersistentState {
         }
         tag.put("triggeredPlayers", playersList);
 
-        return tag; // 确保 return 语句在最后
+        return tag;
     }
-    //从77行到111行是屎山代码，最好别动……
-    public void setWorldSavePath(File worldSavePath) {
-        this.triggeredPlayersFile = new File(worldSavePath, "data/levelclear_triggered_players.dat");
-        // 确保 data 目录存在
-        File dataDir = new File(worldSavePath, "data");
-        if (!dataDir.exists()) {
-            dataDir.mkdirs();
-        }
-    }
-    public synchronized void saveTriggeredPlayersToFile() {
-        try (FileOutputStream fos = new FileOutputStream(triggeredPlayersFile);
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-            oos.writeObject(triggeredPlayers);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    public synchronized void loadTriggeredPlayersFromFile() {
-        if (!triggeredPlayersFile.exists()) return;
 
-        try (FileInputStream fis = new FileInputStream(triggeredPlayersFile);
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
-            triggeredPlayers = (List<String>) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
     public void addTriggeredPlayer(String playerName) {
         if (!triggeredPlayers.contains(playerName)) {
             triggeredPlayers.add(playerName);
-            markDirty(); // 标记状态需要保存
-
-            // 异步保存到文件
-            new Thread(this::saveTriggeredPlayersToFile).start();
+            markDirty();
         }
     }
 
@@ -118,6 +74,7 @@ public class LevelClearState extends PersistentState {
         this.triggered = triggered;
         markDirty();
     }
+
     public List<String> getTriggeredPlayers() {
         return new ArrayList<>(triggeredPlayers);
     }

@@ -1,34 +1,37 @@
 {
 	"schemaVersion": 1,
 	"id": "levelclear",
-	"version": "1.0.0",
+	"version": "1.1.0+1.21.1",
 	"name": "LevelClear mod",
 	"description": "一个能帮助你存档断舍离的嚎模组！",
 	"authors": [
-		"playymcmc007"
+		"playymcmc007",
+		"laosun"
 	],
 	"contact": {
 		"homepage": "",
 		"sources": "https://github.com/playymcmc007/LevelClearMod"
 	},
 	"license": "MIT",
-	"icon": "assets/modid/icon.png",
+	"icon": "assets/levelclear/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
           "com.playymcmc007.levelclear.LevelClearMod"
 		],
 		"config": [
-          "com.playymcmc007.levelclear.Config.LevelClearConfig"
+          "com.playymcmc007.levelclear.config.LevelClearConfig"
+		],
+		"modmenu": [
+			"com.playymcmc007.levelclear.ModMenuIntegration"
 		]
 	},
 	"depends": {
-		"fabricloader": "*",
 		"minecraft": "1.21.1",
-		"java": ">=21",
-		"fabric-api": "*"
+		"fabric-api": "*",
+		"cloth-config": ">=15.0.140"
 	},
 	"suggests": {
-		"another-mod": "*"
+		"modmenu": ">=11.0.3"
 	}
 }
