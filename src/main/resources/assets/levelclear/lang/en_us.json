@@ -1,5 +1,5 @@
 {
-  "text.autoconfig.levelclear.title": "Title!!!",
+  "text.autoconfig.levelclear.title": "Mod Config",
   "text.autoconfig.levelclear.option.triggerItems": "Trigger Items",
   "text.autoconfig.levelclear.option.triggerItems.@Tooltip": "Specify the item IDs required to clear the level. Multiple items can be added.",
   "text.autoconfig.levelclear.option.triggerAdvancements": "Trigger Advancements",
