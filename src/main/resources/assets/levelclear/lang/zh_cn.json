@@ -7,5 +7,7 @@
   "text.autoconfig.levelclear.option.chatMessage": "通关后打印信息",
   "text.autoconfig.levelclear.option.chatMessage.@Tooltip": "通关时聊天框显示的信息（<player>为通关者）",
   "text.autoconfig.levelclear.option.destroySaveOnExit": "退出存档后销毁",
-  "text.autoconfig.levelclear.option.destroySaveOnExit.@Tooltip": "是否启用存档销毁选项，若为true，存档将在退出游戏后删除"
+  "text.autoconfig.levelclear.option.destroySaveOnExit.@Tooltip": "是否启用存档销毁选项，若为true，存档将在退出游戏后删除",
+  "text.autoconfig.levelclear.option.minPlayersToDestroySave":"指定最小玩家人数",
+  "text.autoconfig.levelclear.option.minPlayersToDestroySave.@Tooltip":"触发存档销毁的最小玩家人数"
 }
