@@ -1,5 +1,5 @@
 {
-  "text.autoconfig.levelclear.title": "Title!!!",
+  "text.autoconfig.levelclear.title": "模组配置",
   "text.autoconfig.levelclear.option.triggerItems": "指定物品",
   "text.autoconfig.levelclear.option.triggerItems.@Tooltip": "通关所指定的物品ID，可同时填写多个",
   "text.autoconfig.levelclear.option.triggerAdvancements": "指定成就",
