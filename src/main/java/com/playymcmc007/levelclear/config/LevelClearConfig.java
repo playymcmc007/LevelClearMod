@@ -3,7 +3,6 @@ package com.playymcmc007.levelclear.config;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
-import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,4 +24,8 @@ public class LevelClearConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public boolean destroySaveOnExit = false;
     // public String destroySaveOnExitDescription = "# 是否启用存档销毁选项，若为true，存档将在退出游戏后删除";
+
+    @ConfigEntry.Gui.Tooltip
+    public int minPlayersToDestroySave = 1;
+    // public int minPlayersToDestroySaveDescription = "# 触发存档销毁的最小玩家人数";
 }
