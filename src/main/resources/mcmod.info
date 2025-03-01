@@ -1,0 +1,13 @@
+[
+{
+  "modid": "levelclear",
+  "name": "LevelClear mod",
+  "description": "一个能帮助你存档断舍离的嚎模组！",
+  "version": "1.1.0+1.12.2",
+  "mcversion": "1.12.2",
+  "authorList": [
+    "playymcmc007",
+    "laosun"
+  ]
+}
+]

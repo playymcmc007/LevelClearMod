@@ -1,74 +1,29 @@
-plugins {
-	id 'fabric-loom' version '1.9-SNAPSHOT'
-	id 'maven-publish'
+
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "https://files.minecraftforge.net/maven" }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
+    }
 }
 
-version = project.mod_version
-group = project.maven_group
+apply plugin: 'net.minecraftforge.gradle'
 
-base {
-	archivesName = project.archives_base_name
+version = "1.1.0+1.12.2"
+group = "com.playymcmc007.levelclear"
+archivesBaseName = "levelclear"
+
+sourceCompatibility = targetCompatibility = '1.8'
+compileJava {
+    sourceCompatibility = targetCompatibility = '1.8'
 }
 
-repositories {
-	maven { url 'https://maven.fabricmc.net/' }
-	maven { url "https://maven.shedaniel.me/" }
-	maven { url "https://maven.terraformersmc.com/" }
-	mavenCentral()
+minecraft {
+    mappings channel: 'snapshot', version: '20171003-1.12'
 }
 
 dependencies {
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	modApi "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
-	modImplementation("com.terraformersmc:modmenu:${project.modmenu_version}")
-}
-
-loom {
-	// accessWidenerPath = file("src/main/resources/levelclear.accesswidener")
-	mods {
-		"levelclear" {
-			sourceSet sourceSets.main
-		}
-	}
-
-}
-
-java {
-	withSourcesJar()
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
-}
-
-jar {
-	from("LICENSE") {
-		rename { "${it}_${project.base.archivesName.get()}" }
-	}
-}
-
-processResources {
-	inputs.property "version", project.version
-
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
-	}
-}
-
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			from components.java
-		}
-	}
-
-	repositories {
-
-	}
-}
-
-tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
-	options.encoding = 'UTF-8'
+    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2855'
 }

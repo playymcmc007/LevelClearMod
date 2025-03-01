@@ -1,0 +1,10 @@
+config.levelclear.triggerItems=触发物品列表
+config.levelclear.triggerAdvancements=触发进度列表
+config.levelclear.chatMessage=通关后打印信息
+config.levelclear.destroySaveOnExit=退出存档后销毁
+config.levelclear.minPlayersToDestroySave=最小触发玩家人数
+config.levelclear.triggerItems.@Comment=通关所指定的物品ID，可同时填写多个
+config.levelclear.triggerAdvancements.@Comment=通关所指定的进度ID，可同时填写多个
+config.levelclear.chatMessage.@Comment=通关时聊天框显示的信息（<player>为通关者）
+config.levelclear.destroySaveOnExit.@Comment=是否启用存档销毁选项，若为true，存档将在退出游戏后删除
+config.levelclear.minPlayersToDestroySave.@Comment=触发存档销毁的最小玩家人数

@@ -1,0 +1,10 @@
+config.levelclear.triggerItems=Trigger Items
+config.levelclear.triggerAdvancements=Trigger Advancements
+config.levelclear.chatMessage=Chat Message
+config.levelclear.destroySaveOnExit=Destroy Save on Exit
+config.levelclear.minPlayersToDestroySave=Minimum Players to Destroy Save
+config.levelclear.triggerItems.@Comment=Specify the item IDs required to clear the level. Multiple items can be added.
+config.levelclear.triggerAdvancements.@Comment=Specify the advancement IDs required to clear the level. Multiple advancements can be added.
+config.levelclear.chatMessage.@Comment=The message displayed in the chat when the level is cleared (<player> will be replaced with the player's name).
+config.levelclear.destroySaveOnExit.@Comment=Whether to enable the option to delete the game save upon exiting. If true, the save will be deleted after exiting the game.
+config.levelclear.minPlayersToDestroySave.@Comment=The minimum number of players required to trigger the deletion of the game save.

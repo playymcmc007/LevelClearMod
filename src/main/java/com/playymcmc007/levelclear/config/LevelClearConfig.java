@@ -1,31 +1,26 @@
 package com.playymcmc007.levelclear.config;
 
-import me.shedaniel.autoconfig.ConfigData;
-import me.shedaniel.autoconfig.annotation.Config;
-import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import net.minecraftforge.common.config.Config;
 
-import java.util.ArrayList;
-import java.util.List;
+@Config(modid = "levelclear", category = "levelclear")
+public class LevelClearConfig {
+    // 触发物品列表
+    @Config.Comment({"${config.levelclear.triggerItems}", "${config.levelclear.triggerItems.@Comment}"})
+    public static String[] triggerItems = new String[]{"minecraft:elytra", "minecraft:nether_star"};
 
-@Config(name = "levelclear")
-public class LevelClearConfig implements ConfigData {
-    @ConfigEntry.Gui.Tooltip
-    public List<String> triggerItems = new ArrayList<>(List.of("minecraft:elytra", "minecraft:nether_star"));
-    // public String triggerItemsDescription = "# 通关所指定的物品ID，可同时填写多个";
+    // 触发进度列表
+    @Config.Comment({"${config.levelclear.triggerAdvancements}", "${config.levelclear.triggerAdvancements.@Comment}"})
+    public static String[] triggerAdvancements = new String[]{"minecraft:nether/create_beacon", "minecraft:end/elytra"};
 
-    @ConfigEntry.Gui.Tooltip
-    public List<String> triggerAdvancements = new ArrayList<>(List.of("minecraft:nether/create_beacon","minecraft:end/elytra"));
-    // public String triggerAdvancementsDescription = "# 通关所指定的进度ID，可同时填写多个";
+    // 聊天消息
+    @Config.Comment({"${config.levelclear.chatMessage}", "${config.levelclear.chatMessage.@Comment}"})
+    public static String chatMessage = "<player> 通关了这个存档";
 
-    @ConfigEntry.Gui.Tooltip
-    public String chatMessage = "<player> 通关了这个存档";
-    // public String chatMessageDescription = "# 通关时聊天框显示的信息（<player>为通关者）";
+    // 退出时删除存档
+    @Config.Comment({"${config.levelclear.destroySaveOnExit}", "${config.levelclear.destroySaveOnExit.@Comment"})
+    public static boolean destroySaveOnExit = false;
 
-    @ConfigEntry.Gui.Tooltip
-    public boolean destroySaveOnExit = false;
-    // public String destroySaveOnExitDescription = "# 是否启用存档销毁选项，若为true，存档将在退出游戏后删除";
-
-    @ConfigEntry.Gui.Tooltip
-    public int minPlayersToDestroySave = 1;
-    // public int minPlayersToDestroySaveDescription = "# 触发存档销毁的最小玩家人数";
+    // 最小触发玩家数
+    @Config.Comment({"${config.levelclear.minPlayersToDestroySave}", "${config.levelclear.minPlayersToDestroySave.@Tooltip}"})
+    public static int minPlayersToDestroySave = 1;
 }
