@@ -5,9 +5,18 @@
   "text.autoconfig.levelclear.option.triggerAdvancements": "Trigger Advancements",
   "text.autoconfig.levelclear.option.triggerAdvancements.@Tooltip": "Specify the advancement IDs required to clear the level. Multiple advancements can be added.",
   "text.autoconfig.levelclear.option.chatMessage": "Chat Message",
-  "text.autoconfig.levelclear.option.chatMessage.@Tooltip": "The message displayed in the chat when the level is cleared (<player> will be replaced with the player's name).",
+  "text.autoconfig.levelclear.option.chatMessage.@Tooltip": "The message displayed in the chat when the level is cleared (<player> will be replaced with the player's name). If left empty, the message from the JSON language file will be used.",
   "text.autoconfig.levelclear.option.destroySaveOnExit": "Destroy Game Save on Exit",
   "text.autoconfig.levelclear.option.destroySaveOnExit.@Tooltip": "Whether to enable the option to delete the game save upon exiting. If true, the save will be deleted after exiting the game.",
   "text.autoconfig.levelclear.option.minPlayersToDestroySave":"Minimum Players to Destroy Game Save",
-  "text.autoconfig.levelclear.option.minPlayersToDestroySave.@Tooltip":"The minimum number of players required to trigger the deletion of the game save."
+  "text.autoconfig.levelclear.option.minPlayersToDestroySave.@Tooltip":"The minimum number of players required to trigger the deletion of the game save.",
+  "text.autoconfig.levelclear.option.messageCooldown": "Message Cooldown",
+  "text.autoconfig.levelclear.option.messageCooldown.@Tooltip": "The time interval (in milliseconds) between sending messages.",
+  "text.autoconfig.levelclear.option.deleteWorldRetryAttempts": "Retry Attempts",
+  "text.autoconfig.levelclear.option.deleteWorldRetryAttempts.@Tooltip": "The number of retry attempts when deleting the world.",
+  "text.autoconfig.levelclear.option.retryDelayMillis": "Retry Delay",
+  "text.autoconfig.levelclear.option.retryDelayMillis.@Tooltip": "The delay time (in milliseconds) between retry attempts.",
+  "text.autoconfig.levelclear.option.showMultiLanguageLogs":"Output bilingual logs (Chinese and English)",
+  "text.autoconfig.levelclear.option.showMultiLanguageLogs.@Tooltip":"(For developers) Whether to output bilingual logs (Chinese and English) simultaneously.",
+  "levelclear.message":"%s has cleared the level"
 }

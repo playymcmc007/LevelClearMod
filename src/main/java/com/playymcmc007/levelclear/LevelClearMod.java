@@ -34,11 +34,9 @@ public class LevelClearMod implements ModInitializer {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             LevelClearState state = LevelClearState.getServerState(server);
 
-            // 检查玩家是否持有触发物品
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                 boolean hasTriggerItem = false;
 
-                // 检查主手物品栏
                 for (ItemStack stack : player.getInventory().main) {
                     if (isTriggerItem(stack)) {
                         hasTriggerItem = true;
@@ -46,7 +44,6 @@ public class LevelClearMod implements ModInitializer {
                     }
                 }
 
-                // 检查副手物品栏
                 if (!hasTriggerItem) {
                     ItemStack offhandStack = player.getInventory().offHand.getFirst();
                     if (isTriggerItem(offhandStack)) {
@@ -54,14 +51,12 @@ public class LevelClearMod implements ModInitializer {
                     }
                 }
 
-                // 如果玩家持有触发物品，添加到触发列表
                 if (hasTriggerItem && !state.getTriggeredPlayers().contains(player.getName().getString())) {
                     state.setTriggered(true);
                     state.addTriggeredPlayer(player.getName().getString());
                 }
             }
 
-            // 检查玩家是否完成指定进度
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                 PlayerAdvancementTracker tracker = player.getAdvancementTracker();
                 for (String advancementId : config.triggerAdvancements) {
@@ -88,68 +83,80 @@ public class LevelClearMod implements ModInitializer {
             LevelClearState state = LevelClearState.getServerState(server);
 
             if (state.isTriggered() && config.destroySaveOnExit) {
-                // 检查是否满足最小玩家数量
                 boolean meetMinPlayers = state.getTriggeredPlayers().size() >= config.minPlayersToDestroySave;
 
                 if (meetMinPlayers) {
-                    LOGGER.info("所有触发玩家已离线，正在关闭服务器并删除存档...");
-
+                    if (config.showMultiLanguageLogs) {
+                        LOGGER.info("[EN] All triggering players have gone offline. Shutting down the server and deleting the world...");
+                        LOGGER.info("[ZH] 所有触发玩家已离线，正在关闭服务器并删除存档...");
+                    } else {
+                        LOGGER.info("All triggering players have gone offline. Shutting down the server and deleting the world...");
+                    }
                     try {
-                        boolean success = deleteWorldWithRetry(server, 3);
+                        boolean success = deleteWorldWithRetry(server, config.deleteWorldRetryAttempts);
                         if (!success) {
-                            LOGGER.error("存档删除失败，请手动检查存档文件夹。");
+                            if (config.showMultiLanguageLogs) {
+                                LOGGER.error("[EN] Failed to delete the world. Please check the world folder manually.");
+                                LOGGER.error("[ZH] 存档删除失败，请手动检查存档文件夹。");
+                            } else {
+                                LOGGER.error("Failed to delete the world. Please check the world folder manually.");
+                            }
                         }
                     } catch (Exception e) {
-                        LOGGER.error("关闭服务器时发生错误: {}", e.getMessage());
+                        if (config.showMultiLanguageLogs) {
+                            LOGGER.error("[EN] An error occurred while shutting down the server: {}", e.getMessage());
+                            LOGGER.error("[ZH] 关闭服务器时发生错误: {}", e.getMessage());
+                        } else {
+                            LOGGER.error("An error occurred while shutting down the server: {}", e.getMessage());
+                        }
                     }
                 } else {
-                    LOGGER.info("触发玩家数量不足，跳过存档删除。");
+                    if (config.showMultiLanguageLogs) {
+                        LOGGER.info("[EN] Not enough triggering players. Skipping world deletion.");
+                        LOGGER.info("[ZH] 触发玩家数量不足，跳过存档删除。");
+                    } else {
+                        LOGGER.info("Not enough triggering players. Skipping world deletion.");
+                    }
                 }
             }
         });
     }
 
-
-    // 辅助方法：判断物品是否为触发物品
     private boolean isTriggerItem(ItemStack stack) {
         if (stack.isEmpty()) {
-            return false; // 如果物品堆栈为空，返回 false
+            return false;
         }
 
-        // 获取物品的注册名（Identifier）
         Identifier itemId = Registries.ITEM.getId(stack.getItem());
 
-        // 检查物品的注册名是否在配置文件的 triggerItems 列表中
         return config.triggerItems.contains(itemId.toString());
     }
 
     private void triggerLevelClear(MinecraftServer server) {
         LevelClearState state = LevelClearState.getServerState(server);
-        state.setTriggered(true); // 标记为已触发
-        long currentTime = System.currentTimeMillis(); // 获取当前时间
+        state.setTriggered(true);
+        long currentTime = System.currentTimeMillis();
 
-        // 检查是否超过 1 分钟
-        if (currentTime - lastMessageTime >= 60000) {
-            // 获取触发玩家的名字
+        if (currentTime - lastMessageTime >= config.messageCooldown) {
             String allPlayerNames = state.getTriggeredPlayers().isEmpty() ? "未知玩家" : String.join("、", state.getTriggeredPlayers());
-            // 显示聊天消息，替换 <player> 为所有触发过的玩家名字
+            String message;
+            if (config.chatMessage.isEmpty()) {
+                message = Text.translatable("levelclear.message", allPlayerNames).getString();
+            } else {
+                message = config.chatMessage.replace("<player>", allPlayerNames);
+            }
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-                String message = config.chatMessage.replace("<player>", allPlayerNames);
                 player.sendMessage(Text.of(message), false);
             }
-
-            // 更新上次显示消息的时间
             lastMessageTime = currentTime;
         }
 
         // 模式修改逻辑
         for (String playerName : state.getTriggeredPlayers()) {
-            // 获取当前在线玩家列表
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-                // 检查玩家是否在触发列表中且在线
                 if (player.getName().getString().equals(playerName)) {
                     player.changeGameMode(GameMode.SPECTATOR);
-                    break; // 找到玩家后跳出内层循环
+                    break;
                 }
             }
         }
@@ -160,20 +167,41 @@ public class LevelClearMod implements ModInitializer {
         File worldFolder = new File(worldFolderName);
 
         if (!worldFolder.exists()) {
-            LOGGER.error("存档文件夹不存在: {}", worldFolder.getAbsolutePath());
+            if (config.showMultiLanguageLogs) {
+                // 同时输出中文和英文日志
+                LOGGER.error("[EN] World folder does not exist: {}", worldFolder.getAbsolutePath());
+                LOGGER.error("[ZH] 存档文件夹不存在: {}", worldFolder.getAbsolutePath());
+            } else {
+                // 只输出英文日志
+                LOGGER.error("World folder does not exist: {}", worldFolder.getAbsolutePath());
+            }
             return false;
         }
 
         try {
             deleteFolder(worldFolder);
-            LOGGER.info("存档已删除: {}", worldFolder.getAbsolutePath());
+            if (config.showMultiLanguageLogs) {
+                // 同时输出中文和英文日志
+                LOGGER.info("[EN] World deleted: {}", worldFolder.getAbsolutePath());
+                LOGGER.info("[ZH] 存档已删除: {}", worldFolder.getAbsolutePath());
+            } else {
+                // 只输出英文日志
+                LOGGER.info("World deleted: {}", worldFolder.getAbsolutePath());
+            }
             return true;
         } catch (IOException e) {
             if (remainingAttempts > 0) {
-                LOGGER.error("删除存档失败，剩余重试次数: {}，0.5秒后重试...", remainingAttempts);
+                double retryDelaySeconds = config.retryDelayMillis / 1000.0;
+                String retryDelayDescription = String.format("%.3f", retryDelaySeconds).replaceAll("\\.?0+$", "");
+                if (config.showMultiLanguageLogs) {
+                    LOGGER.error("[EN] Failed to delete world. Remaining attempts: {}, retrying in {} seconds...", remainingAttempts, retryDelayDescription);
+                    LOGGER.error("[ZH] 删除存档失败，剩余重试次数: {}，{}秒后重试...", remainingAttempts, retryDelayDescription);
+                } else {
+                    LOGGER.error("Failed to delete world. Remaining attempts: {}, retrying in {} seconds...", remainingAttempts, retryDelayDescription);
+                }
                 server.submit(() -> {
                     try {
-                        Thread.sleep(500);
+                        Thread.sleep(config.retryDelayMillis);
                     } catch (InterruptedException ignored) {
 
                     }
@@ -181,7 +209,12 @@ public class LevelClearMod implements ModInitializer {
                     return null;
                 });
             } else {
-                LOGGER.error("存档删除失败: {}", e.getMessage());
+                if (config.showMultiLanguageLogs) {
+                    LOGGER.error("[EN] Failed to delete world: {}", e.getMessage());
+                    LOGGER.error("[ZH] 存档删除失败: {}", e.getMessage());
+                } else {
+                    LOGGER.error("Failed to delete world: {}", e.getMessage());
+                }
             }
             return false;
         }
@@ -197,7 +230,7 @@ public class LevelClearMod implements ModInitializer {
             }
         }
         if (!folder.delete()) {
-            throw new IOException("无法删除: " + folder.getAbsolutePath());
+            throw new IOException("Failed to delete: " + folder.getAbsolutePath());
         }
     }
 }

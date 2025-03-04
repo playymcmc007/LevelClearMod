@@ -36,7 +36,6 @@ public class LevelClearState extends PersistentState {
         LevelClearState state = new LevelClearState();
         state.triggered = tag.getBoolean("triggered");
         state.shouldDestroySave = tag.getBoolean("shouldDestroySave");
-        // 读取触发玩家名字列表
         NbtList playersList = tag.getList("triggeredPlayers", NbtElement.STRING_TYPE);
         for (NbtElement element : playersList) {
             state.triggeredPlayers.add(element.asString());
@@ -49,7 +48,6 @@ public class LevelClearState extends PersistentState {
         tag.putBoolean("triggered", triggered);
         tag.putBoolean("shouldDestroySave", shouldDestroySave);
 
-        // 保存触发玩家名字列表到 NBT
         NbtList playersList = new NbtList();
         for (String player : triggeredPlayers) {
             playersList.add(NbtString.of(player));
