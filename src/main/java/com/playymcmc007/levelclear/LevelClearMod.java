@@ -92,19 +92,41 @@ public class LevelClearMod {
 }
         if (LevelClearConfig.destroySaveOnExit &&
                 state.getTriggeredPlayers().size() >= LevelClearConfig.minPlayersToDestroySave) {
-            logger.info("正在关闭服务器并删除存档...");
+            if (LevelClearConfig.showMultiLanguageLogs) {
+                // 同时输出中文和英文日志
+                logger.info("[EN] Shutting down the server and deleting the world...");
+                logger.info("[ZH] 正在关闭服务器并删除存档...");
+            } else {
+                // 只输出英文日志
+                logger.info("Shutting down the server and deleting the world...");
+            }
 
             // 异步删除存档
             new Thread(() -> {
                 try {
-                    Thread.sleep(3000);
-                    deleteWorldWithRetry(Objects.requireNonNull(world.getMinecraftServer()), 10);
+                    // 使用配置项的值
+                    Thread.sleep(LevelClearConfig.deleteWorldDelayMillis);
+                    deleteWorldWithRetry(Objects.requireNonNull(world.getMinecraftServer()), LevelClearConfig.deleteWorldRetryAttempts);
                 } catch (InterruptedException e) {
-                    logger.warning("关闭服务器并删除存档时发生错误: " + e.getMessage());
+                    if (LevelClearConfig.showMultiLanguageLogs) {
+                        // 同时输出中文和英文日志
+                        logger.warning("[EN] An error occurred while shutting down the server and deleting the world: " + e.getMessage());
+                        logger.warning("[ZH] 关闭服务器并删除存档时发生错误: " + e.getMessage());
+                    } else {
+                        // 只输出英文日志
+                        logger.warning("An error occurred while shutting down the server and deleting the world: " + e.getMessage());
+                    }
                 }
             }).start();
         } else {
-            logger.info("触发玩家数量不足，跳过存档删除。");
+            if (LevelClearConfig.showMultiLanguageLogs) {
+                // 同时输出中文和英文日志
+                logger.info("[EN] Not enough triggering players. Skipping world deletion.");
+                logger.info("[ZH] 触发玩家数量不足，跳过存档删除。");
+            } else {
+                // 只输出英文日志
+                logger.info("Not enough triggering players. Skipping world deletion.");
+            }
         }
     }
 
@@ -133,7 +155,7 @@ public class LevelClearMod {
     private void triggerLevelClear(net.minecraft.server.MinecraftServer server, LevelClearState state) {
         state.setTriggered(true);
         long currentTime = System.currentTimeMillis();
-        if (currentTime - lastMessageTime >= 60000) {
+        if (currentTime - lastMessageTime >= LevelClearConfig.messageCooldown) {
             String playerNames = String.join("、", state.getTriggeredPlayers());
             String message = LevelClearConfig.chatMessage.replace("<player>", playerNames);
             for (EntityPlayerMP player : server.getPlayerList().getPlayers()) {
@@ -156,19 +178,41 @@ public class LevelClearMod {
 
         try {
             deleteFolder(worldDir);
-            logger.info("存档已删除: " + worldDir.getAbsolutePath());
+            if (LevelClearConfig.showMultiLanguageLogs) {
+                logger.info("[EN] World deleted: " + worldDir.getAbsolutePath());
+                logger.info("[ZH] 存档已删除: " + worldDir.getAbsolutePath());
+            } else {
+                logger.info("存档已删除: " + worldDir.getAbsolutePath());
+            }
             return true;
         } catch (IOException e) {
             if (remainingAttempts > 0) {
                 server.addScheduledTask(() -> {
-                    logger.warning("存档删除失败，剩余重试次数: " + remainingAttempts + "，0.5秒后重试... ");
+                    // 计算时间描述（秒）
+                    double retryDelaySeconds = LevelClearConfig.retryDelayMillis / 1000.0;
+                    String retryDelayDescription = String.format("%.3f", retryDelaySeconds).replaceAll("\\.?0+$", ""); // 保留小数点后三位，并去掉末尾多余的0
+
+                    // 输出日志
+                    if (LevelClearConfig.showMultiLanguageLogs) {
+                        logger.warning("[EN] Failed to delete world. Remaining attempts: " + remainingAttempts + ", retrying in " + retryDelayDescription + " seconds...");
+                        logger.warning("[ZH] 存档删除失败，剩余重试次数: " + remainingAttempts + "，" + retryDelayDescription + "秒后重试...");
+                    } else {
+                        logger.warning("存档删除失败，剩余重试次数: " + remainingAttempts + "，" + retryDelayDescription + "秒后重试...");
+                    }
+
                     try {
-                        Thread.sleep(500);
+                        Thread.sleep(LevelClearConfig.retryDelayMillis); // 使用配置项的值
                         deleteWorldWithRetry(server, remainingAttempts - 1);
-                    } catch (InterruptedException ignored) {}
+                    } catch (InterruptedException ignored) {
+                    }
                 });
             } else {
-                logger.warning("存档删除失败，路径: " + worldDir.getAbsolutePath());
+                if (LevelClearConfig.showMultiLanguageLogs) {
+                    logger.warning("[EN] Failed to delete world: " + worldDir.getAbsolutePath());
+                    logger.warning("[ZH] 存档删除失败，路径: " + worldDir.getAbsolutePath());
+                } else {
+                    logger.warning("存档删除失败，路径: " + worldDir.getAbsolutePath());
+                }
             }
             return false;
         }
@@ -184,7 +228,11 @@ public class LevelClearMod {
             }
         }
         if (!folder.delete()) {
-            throw new IOException("无法删除文件: " + folder.getAbsolutePath());
+            if (LevelClearConfig.showMultiLanguageLogs) {
+                throw new IOException("无法删除文件: " + folder.getAbsolutePath() + " (Failed to delete file: " + folder.getAbsolutePath() + ")");
+            } else {
+                throw new IOException("无法删除文件: " + folder.getAbsolutePath());
+            }
         }
     }
 }
